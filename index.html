@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Iker Serrato · Controls & Data Engineering</title>
+<meta name="description" content="Iker Serrato: controls engineer in intralogistics and automated warehousing, studying an MSc in Data Science at UOC.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --steel: #E8ECEF;
+    --panel: #F7F9FA;
+    --ink: #15212C;
+    --blue: #2F5675;
+    --muted: #56636F;
+    --line: #C5CED6;
+    --yellow: #F2B705;
+    --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+    --body: "Barlow", "Segoe UI", system-ui, sans-serif;
+    --wrap: 1080px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+  body {
+    margin: 0;
+    background: var(--steel);
+    color: var(--ink);
+    font: 400 1.0625rem/1.6 var(--body);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--blue); text-underline-offset: 3px; }
+  a:hover { color: var(--ink); }
+  :focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+  h1, h2, h3 { font-family: var(--display); line-height: 1.05; margin: 0; }
+  h2 { font-size: clamp(2rem, 4vw, 2.75rem); font-weight: 700; margin-bottom: 0.5em; }
+  h3 { font-size: 1.6rem; font-weight: 600; }
+  p { margin: 0 0 1em; max-width: 68ch; }
+
+  /* Top bar */
+  .top {
+    position: sticky; top: 0; z-index: 100;
+    padding: 14px 0; background: var(--steel);
+    border-bottom: 1px solid var(--line);
+  }
+  .top .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .top nav { display: flex; gap: 22px; flex-wrap: wrap; }
+  .top nav a { color: var(--ink); text-decoration: none; font-weight: 500; }
+  .top nav a:hover { color: var(--blue); text-decoration: underline; }
+  .mark { font-family: var(--display); font-weight: 700; font-size: 1.25rem; color: var(--ink); text-decoration: none; }
+
+  /* Hero */
+  .hero { padding: 56px 0 72px; }
+  .hero h1 { font-size: clamp(3.5rem, 11vw, 8.5rem); font-weight: 700; letter-spacing: -0.01em; }
+  .hero .lede { font-size: clamp(1.15rem, 2.2vw, 1.4rem); max-width: 40ch; margin-top: 18px; color: var(--ink); }
+  .hero .where { color: var(--muted); margin-top: 6px; }
+
+  /* Conveyor */
+  .conveyor { position: relative; margin-top: 56px; }
+  .belt {
+    position: relative; height: 22px; border-radius: 11px;
+    background:
+      repeating-linear-gradient(90deg, transparent 0 18px, rgba(255,255,255,.18) 18px 20px),
+      var(--ink);
+  }
+  .tote {
+    position: absolute; top: -30px; left: 12.5%;
+    width: 46px; height: 30px; margin-left: -23px;
+    background: var(--yellow); border-radius: 3px 3px 5px 5px;
+    box-shadow: inset 0 -6px 0 rgba(0,0,0,.12);
+    animation: travel 4.2s cubic-bezier(.45,.05,.35,1) .4s both;
+  }
+  .tote::before {
+    content: ""; position: absolute; left: 14px; right: 14px; top: 6px; height: 5px;
+    border-radius: 3px; background: rgba(0,0,0,.22);
+  }
+  @keyframes travel {
+    0%, 8%   { left: 12.5%; }
+    28%, 36% { left: 37.5%; }
+    56%, 64% { left: 62.5%; }
+    90%, 100%{ left: 87.5%; }
+  }
+  .stops { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); }
+  .stops li { position: relative; padding: 26px 12px 0; text-align: center; }
+  .stops li::before {
+    content: ""; position: absolute; top: -4px; left: 50%; width: 2px; height: 22px; background: var(--line); margin-left: -1px;
+  }
+  .stops .yr { display: block; font-family: var(--display); font-weight: 600; font-size: 1.15rem; color: var(--muted); }
+  .stops .org { display: block; font-family: var(--display); font-weight: 700; font-size: 1.5rem; line-height: 1.1; }
+  .stops .what { display: block; color: var(--muted); font-size: .95rem; line-height: 1.35; margin-top: 4px; }
+  .stops li.next .org { color: var(--blue); }
+
+  /* Sections */
+  section { padding: 72px 0; border-top: 1px solid var(--line); }
+  .about-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 48px; align-items: start; }
+  .facts { background: var(--panel); border-left: 4px solid var(--yellow); padding: 20px 24px; }
+  .facts dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 8px 16px; }
+  .facts dt { font-weight: 600; }
+  .facts dd { margin: 0; color: var(--muted); }
+
+  /* Experience */
+  .jobs { list-style: none; margin: 0; padding: 0; }
+  .job { display: grid; grid-template-columns: 150px 1fr; gap: 32px; padding: 28px 0; border-bottom: 1px solid var(--line); }
+  .job:last-child { border-bottom: 0; }
+  .job .when { font-family: var(--display); font-weight: 600; font-size: 1.25rem; color: var(--muted); }
+  .job h3 { margin-bottom: 2px; }
+  .job .role { font-weight: 600; margin: 0 0 10px; }
+  .job ul { margin: 0; padding-left: 1.1em; max-width: 68ch; }
+  .job li { margin-bottom: 6px; }
+  .tools { margin-top: 12px; color: var(--muted); font-size: .95rem; }
+
+  /* Curriculum rack */
+  .legend { display: flex; gap: 28px; flex-wrap: wrap; margin: 4px 0 28px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 10px; }
+  .swatch { width: 22px; height: 16px; border-radius: 2px; display: inline-block; }
+  .swatch.done { background: var(--blue); }
+  .swatch.plan { border: 2px dashed var(--muted); }
+  .rack {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+    border: 6px solid var(--ink); border-top-width: 0; background: var(--ink);
+  }
+  .rack .shelf-label { grid-column: 1 / -1; background: var(--ink); color: var(--steel); font-family: var(--display); font-weight: 600; font-size: 1.05rem; padding: 10px 8px 8px; }
+  .bin {
+    display: flex; flex-direction: column; justify-content: space-between; min-height: 150px;
+    margin: 0 3px 6px; padding: 16px; text-decoration: none; border-radius: 2px;
+  }
+  .bin.done { background: var(--blue); color: #fff; }
+  .bin.done:hover { background: #24445d; color: #fff; }
+  .bin.plan { background: var(--steel); color: var(--ink); outline: 2px dashed var(--muted); outline-offset: -8px; }
+  .bin.plan:hover { background: var(--panel); color: var(--ink); }
+  .bin .name { font-family: var(--display); font-weight: 600; font-size: 1.4rem; line-height: 1.1; }
+  .bin .meta { font-size: .9rem; opacity: .85; margin-top: 14px; }
+  .bin.empty { background: #1e2c38; min-height: 0; }
+  .thesis-note { margin-top: 18px; color: var(--muted); }
+
+  /* Course details */
+  .course { padding: 40px 0; border-top: 1px solid var(--line); scroll-margin-top: 16px; }
+  .course:first-of-type { border-top: 0; }
+  .course header { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+  .status { font-weight: 600; font-size: .95rem; padding: 3px 10px; border-radius: 2px; white-space: nowrap; }
+  .status.done { background: var(--blue); color: #fff; }
+  .status.plan { border: 2px dashed var(--muted); color: var(--ink); }
+  .course .code { color: var(--muted); margin: 0 0 12px; }
+  .course .cols { display: grid; grid-template-columns: 1.3fr 1fr; gap: 40px; }
+  .course h4 { font-family: var(--body); font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+  .course ul { margin: 0 0 16px; padding-left: 1.1em; }
+  .course li { margin-bottom: 4px; }
+  .applies { background: var(--panel); padding: 16px 20px; border-left: 4px solid var(--yellow); align-self: start; }
+  .applies p { margin: 0; }
+  .work { margin-top: 16px; }
+  .planned-note { background: var(--panel); border: 2px dashed var(--muted); padding: 12px 16px; margin: 0 0 16px; max-width: 68ch; }
+  .back { display: inline-block; margin-top: 8px; font-size: .95rem; }
+
+  /* Talks */
+  .talk { display: grid; grid-template-columns: 150px 1fr; gap: 32px; }
+  .talk .when { font-family: var(--display); font-weight: 600; font-size: 1.25rem; color: var(--muted); }
+
+  footer { border-top: 1px solid var(--line); padding: 40px 0 56px; color: var(--muted); }
+  footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+  @media (max-width: 860px) {
+    .about-grid, .course .cols { grid-template-columns: 1fr; gap: 24px; }
+    .rack { grid-template-columns: repeat(2, 1fr); }
+    .bin.empty { display: none; }
+  }
+  @media (max-width: 640px) {
+    html { scroll-padding-top: 104px; }
+    .top { padding: 10px 0; }
+    .top .wrap { gap: 4px 16px; }
+    .top nav { gap: 6px 16px; }
+    .hero { padding: 32px 0 48px; }
+    .belt { display: none; }
+    .stops { grid-template-columns: 1fr; gap: 18px; }
+    .stops li { text-align: left; padding: 0 0 0 20px; border-left: 4px solid var(--ink); }
+    .stops li.next { border-left-color: var(--yellow); }
+    .stops li::before { display: none; }
+    .job, .talk { grid-template-columns: 1fr; gap: 6px; }
+    .rack { grid-template-columns: 1fr; }
+    .bin { min-height: 0; }
+    section { padding: 56px 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .tote { animation: none; left: 87.5%; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="mark" href="#">Iker Serrato</a>
+    <nav aria-label="Main">
+      <a href="#about">About</a>
+      <a href="#experience">Experience</a>
+      <a href="#curriculum">Data science studies</a>
+      <a href="#talks">Talks</a>
+      <a href="https://github.com/ikss-DSi">GitHub</a>
+      <!-- Add your LinkedIn here: <a href="https://www.linkedin.com/in/YOUR-PROFILE">LinkedIn</a> -->
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="wrap">
+      <h1>Iker Serrato</h1>
+      <p class="lede">Controls engineer in automated warehousing, training as a data scientist to put the data these systems generate to work.</p>
+      <p class="where">Barcelona, Spain. Spanish (native), English (C2).</p>
+
+      <div class="conveyor" aria-label="Career path from 2018 to today">
+        <div class="belt" aria-hidden="true"><div class="tote"></div></div>
+        <ol class="stops">
+          <li><span class="yr">2018</span><span class="org">Robert Bosch</span><span class="what">IoT devices and data capture</span></li>
+          <li><span class="yr">2020</span><span class="org">Honeywell Intelligrated</span><span class="what">Warehouse software and sorters</span></li>
+          <li><span class="yr">2023</span><span class="org">Vanderlande</span><span class="what">Automated storage systems</span></li>
+          <li class="next"><span class="yr">Now</span><span class="org">Data science</span><span class="what">MSc at UOC, applied to intralogistics</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <section id="about">
+    <div class="wrap about-grid">
+      <div>
+        <h2>About</h2>
+        <p>I have spent my career where software meets moving equipment: designing IoT devices that capture and ship sensor data, commissioning warehouse control software on large fulfilment sites, and now working on the controls of automated storage systems.</p>
+        <p>Every one of those systems produces a constant stream of events, alarms, timings and throughput figures. Most of it is used to keep the system running, and very little of it is used to improve the business. That gap is why I'm studying data science: to turn operational data from sorters, shuttles and storage systems into better metrics, new applications and better-informed product decisions.</p>
+        <p>I'm looking to collaborate with teams already working on data, analytics or AI in material handling.</p>
+      </div>
+      <aside class="facts" aria-label="Key facts">
+        <dl>
+          <dt>Role</dt><dd>Controls Data Engineer II, Vanderlande</dd>
+          <dt>Domain</dt><dd>WCS/WMS, commissioning, automated storage, sortation</dd>
+          <dt>Languages</dt><dd>C# / .NET, SQL, Python, R</dd>
+          <dt>Studying</dt><dd>MSc in Data Science, UOC</dd>
+          <dt>Degree</dt><dd>BEng Mechatronics, UNAM</dd>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <section id="experience">
+    <div class="wrap">
+      <h2>Experience</h2>
+      <ol class="jobs">
+        <li class="job">
+          <div class="when">2023 – now</div>
+          <div>
+            <h3>Vanderlande</h3>
+            <p class="role">Controls Data Engineer II, Barcelona</p>
+            <ul>
+              <li>Controls and warehouse control software (WCS/WMS) for automated storage, mainly ADAPTO, micro-shuttle and HDS systems.</li>
+              <li>Commissioning and integration on intralogistics projects across Europe and Latin America.</li>
+            </ul>
+            <p class="tools">Main tools: C# / .NET, SQL</p>
+          </div>
+        </li>
+        <li class="job">
+          <div class="when">2020 – 2023</div>
+          <div>
+            <h3>Honeywell Intelligrated</h3>
+            <p class="role">Application Engineer, software and commissioning, Ohio, USA</p>
+            <ul>
+              <li>Software commissioning of the In-Control Warehouse (ICW) and MC4 warehouse control platforms.</li>
+              <li>Commissioning of shoe-sorter systems.</li>
+              <li>Deployed on eight large e-commerce fulfilment centres in the United States, as lead software engineer on two of them.</li>
+            </ul>
+            <p class="tools">Main tools: C# / .NET, SQL</p>
+          </div>
+        </li>
+        <li class="job">
+          <div class="when">2018 – 2020</div>
+          <div>
+            <h3>Robert Bosch</h3>
+            <p class="role">Automation &amp; Systems Engineer, Guadalajara, Mexico</p>
+            <ul>
+              <li>Designed IoT devices end to end, from the electronics (Altium) to the data pipeline.</li>
+              <li>Built the acquisition and transformation layer, and delivered data to back-end endpoints over HTTPS and MQTT.</li>
+              <li>Speaker and hackathon mentor at Jalisco Talent Land 2019.</li>
+            </ul>
+            <p class="tools">Main tools: Python, Altium, HTTPS / MQTT</p>
+          </div>
+        </li>
+        <li class="job">
+          <div class="when">2013 – 2018</div>
+          <div>
+            <h3>UNAM</h3>
+            <p class="role">BEng in Mechatronics Engineering, Mexico</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="curriculum">
+    <div class="wrap">
+      <h2>Data science studies</h2>
+      <p><a href="https://www.uoc.edu/es/estudios/masters/master-universitario-data-science">MSc in Data Science</a> at the Universitat Oberta de Catalunya (UOC). Select a course to see what it covers.</p>
+      <div class="legend">
+        <span><i class="swatch done" aria-hidden="true"></i>Completed</span>
+        <span><i class="swatch plan" aria-hidden="true"></i>Planned, not yet taken</span>
+      </div>
+
+      <div class="rack">
+        <div class="shelf-label">Core courses</div>
+        <a class="bin done" href="#c-fundamentals"><span class="name">Fundamentals of Data Science</span><span class="meta">Completed</span></a>
+        <a class="bin done" href="#c-lifecycle"><span class="name">Data Typology and Life Cycle</span><span class="meta">Completed</span></a>
+        <a class="bin done" href="#c-nosql"><span class="name">Non-Relational Database Architectures</span><span class="meta">Completed</span></a>
+        <a class="bin done" href="#c-stats"><span class="name">Statistical Analysis</span><span class="meta">Completed</span></a>
+        <a class="bin done" href="#c-ml"><span class="name">Machine Learning</span><span class="meta">Completed</span></a>
+        <a class="bin done" href="#c-viz"><span class="name">Data Visualisation</span><span class="meta">Completed</span></a>
+        <div class="bin empty" aria-hidden="true"></div>
+        <div class="bin empty" aria-hidden="true"></div>
+        <div class="shelf-label">Electives</div>
+        <a class="bin plan" href="#c-bigdata"><span class="name">Big Data Analytics</span><span class="meta">Planned</span></a>
+        <a class="bin plan" href="#c-dl"><span class="name">Deep Learning</span><span class="meta">Planned</span></a>
+        <div class="bin empty" aria-hidden="true"></div>
+        <div class="bin empty" aria-hidden="true"></div>
+      </div>
+      <p class="thesis-note">The programme closes with a 12-ECTS master's thesis.</p>
+
+      <div class="courses">
+
+        <article class="course" id="c-fundamentals">
+          <header><h3>Fundamentals of Data Science</h3><span class="status done">Completed</span></header>
+          <div class="cols">
+            <div>
+              <p>How a data science project works from start to finish, and how to run one responsibly.</p>
+              <h4>Topics</h4>
+              <ul>
+                <li>What data science is, and analytical thinking</li>
+                <li>Life cycle of a data project: capture, preprocessing, analysis, visualisation</li>
+                <li>Project management for data projects</li>
+                <li>Data quality, governance and security</li>
+                <li>Ethics and privacy</li>
+              </ul>
+            </div>
+            <div class="applies"><h4>Where it applies in intralogistics</h4><p>Scoping data projects around operational questions, and setting governance rules for data collected on customer sites.</p></div>
+          </div>
+          <a class="back" href="#curriculum">Back to the course list</a>
+        </article>
+
+        <article class="course" id="c-lifecycle">
+          <header><h3>Data Typology and Life Cycle</h3><span class="status done">Completed</span></header>
+          <div class="cols">
+            <div>
+              <p>Types of data and how to extract, clean and prepare them from different sources, with a focus on the web.</p>
+              <h4>Topics</h4>
+              <ul>
+                <li>Data types and the stages of the data life cycle</li>
+                <li>Web scraping: text and multimedia content, storage and sharing, anti-scraping measures, legal aspects and good practice</li>
+                <li>Data cleaning, analysis and visualisation</li>
+              </ul>
+              <div class="work">
+                <h4>Coursework</h4>
+                <ul>
+                  <li><a href="https://github.com/ikss-DSi/fuel-prices-scraper">fuel-prices-scraper</a>: web scraper for fuel prices (Python)</li>
+                  <li><a href="https://github.com/ikss-DSi/Precio_Combustibles_ESP-">Precio_Combustibles_ESP-</a>: cleaning and analysis of fuel prices across Spain (R)</li>
+                </ul>
+              </div>
+            </div>
+            <div class="applies"><h4>Where it applies in intralogistics</h4><p>Extracting and cleaning data from control-system logs, alarm histories and operator reports so they can be analysed.</p></div>
+          </div>
+          <a class="back" href="#curriculum">Back to the course list</a>
+        </article>
+
+        <article class="course" id="c-nosql">
+          <header><h3>Non-Relational Database Architectures</h3><span class="status done">Completed</span></header>
+          <div class="cols">
+            <div>
+              <p>NoSQL databases as an alternative to relational ones, and how to choose and design the right store for a given problem.</p>
+              <h4>Topics</h4>
+              <ul>
+                <li>Motivation, strengths and drawbacks of NoSQL</li>
+                <li>Data models: key-value, document, column-family and graph</li>
+                <li>Distributed databases, consistency and availability, the CAP theorem, ACID vs BASE</li>
+                <li>Riak, MongoDB, Cassandra and Neo4j</li>
+                <li>Querying and updating data in MongoDB, Cassandra and Neo4j</li>
+              </ul>
+            </div>
+            <div class="applies"><h4>Where it applies in intralogistics</h4><p>Storing high-frequency equipment telemetry and event streams that a relational WCS database is not designed to hold.</p></div>
+          </div>
+          <a class="back" href="#curriculum">Back to the course list</a>
+        </article>
+
+        <article class="course" id="c-stats">
+          <header><h3>Statistical Analysis</h3><span class="status done">Completed</span></header>
+          <div class="cols">
+            <div>
+              <p>The statistics behind data science models, from inference to experimental design.</p>
+              <h4>Topics</h4>
+              <ul>
+                <li>Descriptive statistics, the central limit theorem and confidence intervals</li>
+                <li>Hypothesis testing, including two-sample tests</li>
+                <li>Data preprocessing</li>
+                <li>Predictive modelling and linear regression</li>
+                <li>Experimental design, comparing methods, and analysis of variance (ANOVA)</li>
+              </ul>
+            </div>
+            <div class="applies"><h4>Where it applies in intralogistics</h4><p>Checking whether a change in configuration or control strategy really improves throughput, rather than relying on before-and-after impressions.</p></div>
+          </div>
+          <a class="back" href="#curriculum">Back to the course list</a>
+        </article>
+
+        <article class="course" id="c-ml">
+          <header><h3>Machine Learning</h3><span class="status done">Completed</span></header>
+          <div class="cols">
+            <div>
+              <p>Building, tuning and evaluating models that find patterns in data, and combining them to improve results.</p>
+              <h4>Topics</h4>
+              <ul>
+                <li>Data preparation, validation protocols and evaluation of results</li>
+                <li>Feature extraction and selection, dimensionality reduction</li>
+                <li>Unsupervised learning: hierarchical clustering, k-means and variants, canopy clustering</li>
+                <li>Supervised learning: k-NN, support vector machines, decision trees</li>
+                <li>Ensembles: Random Forest, AdaBoost, gradient boosting</li>
+              </ul>
+            </div>
+            <div class="applies"><h4>Where it applies in intralogistics</h4><p>Predictive maintenance, automatic classification of alarms and faults, and forecasting load on the system.</p></div>
+          </div>
+          <a class="back" href="#curriculum">Back to the course list</a>
+        </article>
+
+        <article class="course" id="c-viz">
+          <header><h3>Data Visualisation</h3><span class="status done">Completed</span></header>
+          <div class="cols">
+            <div>
+              <p>Designing visualisations that communicate clearly, from principles to an interactive final project.</p>
+              <h4>Topics</h4>
+              <ul>
+                <li>What makes a visualisation effective, and common mistakes</li>
+                <li>A guided process from data to visualisation and back</li>
+                <li>Interactivity and good practice</li>
+                <li>A free-topic interactive visualisation project</li>
+              </ul>
+              <div class="work">
+                <h4>Coursework</h4>
+                <ul>
+                  <li><a href="https://github.com/ikss-DSi/pec2-dataviz">pec2-dataviz</a>: assignment 2, data visualisation (HTML)</li>
+                </ul>
+              </div>
+            </div>
+            <div class="applies"><h4>Where it applies in intralogistics</h4><p>Dashboards for availability, throughput and fault trends that make sense to operations, service and customers.</p></div>
+          </div>
+          <a class="back" href="#curriculum">Back to the course list</a>
+        </article>
+
+        <article class="course" id="c-bigdata">
+          <header><h3>Big Data Analytics</h3><span class="status plan">Planned, not yet taken</span></header>
+          <p class="code">Elective</p>
+          <p class="planned-note">I have not taken this course yet. I plan to take it in an upcoming semester.</p>
+          <div class="cols">
+            <div>
+              <p>The technology behind big data projects, and how to analyse data at scale and in real time.</p>
+              <h4>Topics</h4>
+              <ul>
+                <li>Architecture of a big data system: distributed storage and processing</li>
+                <li>Apache Hadoop and Apache Spark</li>
+                <li>Cluster resource management, including Kubernetes</li>
+                <li>Stream processing, and the Lambda and Kappa architectures</li>
+                <li>Big data in the cloud: AWS, Azure and Google Cloud</li>
+                <li>Data analysis and machine learning libraries at scale</li>
+              </ul>
+            </div>
+            <div class="applies"><h4>Where it applies in intralogistics</h4><p>Analysing data across a whole fleet of sites, and processing equipment events as they happen.</p></div>
+          </div>
+          <a class="back" href="#curriculum">Back to the course list</a>
+        </article>
+
+        <article class="course" id="c-dl">
+          <header><h3>Deep Learning</h3><span class="status plan">Planned, not yet taken</span></header>
+          <p class="code">Elective</p>
+          <p class="planned-note">I have not taken this course yet. I plan to take it in an upcoming semester.</p>
+          <div class="cols">
+            <div>
+              <p>Neural networks, from the basics to convolutional, recurrent, transformer and generative models.</p>
+              <h4>Topics</h4>
+              <ul>
+                <li>Artificial neural networks, training and optimisation</li>
+                <li>Convolutional neural networks: fundamentals, architectures and applications</li>
+                <li>Recurrent neural networks</li>
+                <li>Transformers and attention mechanisms</li>
+                <li>Generative models: autoencoders and GANs</li>
+              </ul>
+            </div>
+            <div class="applies"><h4>Where it applies in intralogistics</h4><p>Computer vision on sortation lines, such as detecting damaged parcels or unreadable labels, and sequence models for equipment signals.</p></div>
+          </div>
+          <a class="back" href="#curriculum">Back to the course list</a>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="talks">
+    <div class="wrap">
+      <h2>Talks and community</h2>
+      <div class="talk">
+        <div class="when">2019</div>
+        <div>
+          <h3>Jalisco Talent Land</h3>
+          <p>Speaker on 3D printing and mentor in the hackathon, Guadalajara, Mexico. <a href="https://jaliscotalentland2019.sched.com/speaker/iker_serrato.1zfju7as">See the speaker profile</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Iker Serrato, Barcelona</span>
+    <span><a href="https://github.com/ikss-DSi">github.com/ikss-DSi</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
